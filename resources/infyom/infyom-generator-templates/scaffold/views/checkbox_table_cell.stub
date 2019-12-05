@@ -1,0 +1,3 @@
+
+<td>@if($$MODEL_NAME_CAMEL$->$FIELD_NAME$ =='1') true @else false @endif</td>
+

@@ -1,0 +1,17 @@
+{
+    "name": "parvez/PayMoney",
+    "authors": [
+        {
+            "name": "Robi Parvez",
+            "email": "parvez.techvill@gmail.com"
+        }
+    ],
+    "require": {
+
+    },
+    "autoload": {
+        "psr-0": {
+            "PayMoney": "php-sdk/src/"
+        }
+    }
+}

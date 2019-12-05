@@ -1,0 +1,49 @@
+@extends('admin/layouts/default')
+
+@section('title')
+$MODEL_NAME_PLURAL$
+@parent
+@stop
+@section('content')
+  @include('core-templates::common.errors')
+    <section class="content-header">
+     <h1>$MODEL_NAME_PLURAL$ Edit</h1>
+     <ol class="breadcrumb">
+         <li>
+             <a href="{{ route('admin.dashboard') }}"> <i class="livicon" data-name="home" data-size="16" data-color="#000"></i>
+                 Dashboard
+             </a>
+         </li>
+         <li>$MODEL_NAME_PLURAL$</li>
+         <li class="active">Edit $MODEL_NAME$ </li>
+     </ol>
+    </section>
+    <section class="content paddingleft_right15">
+      <div class="row">
+      <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h4 class="panel-title"> <i class="livicon" data-name="user" data-size="16" data-loop="true" data-c="#fff" data-hc="white"></i>
+                    Edit  $MODEL_NAME$
+                </h4></div>
+            <br />
+        <div class="panel-body">
+        {!! Form::model($$MODEL_NAME_CAMEL$, ['route' => ['$ROUTE_NAMED_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.update', $$MODEL_NAME_CAMEL$->id], 'method' => 'patch']) !!}
+
+        @include('$VIEW_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.fields')
+
+        {!! Form::close() !!}
+        </div>
+      </div>
+    </div>
+   </section>
+ @stop
+@section('footer_scripts')
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("form").submit(function() {
+                $('input[type=submit]').attr('disabled', 'disabled');
+                return true;
+            });
+        });
+    </script>
+@stop

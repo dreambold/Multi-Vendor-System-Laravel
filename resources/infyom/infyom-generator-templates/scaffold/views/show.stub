@@ -1,0 +1,39 @@
+@extends('admin/layouts/default')
+
+@section('title')
+$MODEL_NAME$
+@parent
+@stop
+
+@section('content')
+<section class="content-header">
+    <h1>$MODEL_NAME$ View</h1>
+    <ol class="breadcrumb">
+        <li>
+            <a href="{{ route('admin.dashboard') }}"> <i class="livicon" data-name="home" data-size="16" data-color="#000"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>$MODEL_NAME_PLURAL$</li>
+        <li class="active">$MODEL_NAME$ View</li>
+    </ol>
+</section>
+
+<section class="content paddingleft_right15">
+    <div class="row">
+       <div class="panel panel-primary">
+        <div class="panel-heading clearfix">
+            <h4 class="panel-title"> <i class="livicon" data-name="list-ul" data-size="16" data-loop="true" data-c="#fff" data-hc="white"></i>
+                $MODEL_NAME$ details
+            </h4>
+        </div>
+            <div class="panel-body">
+                @include('$VIEW_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.show_fields')
+            </div>
+        </div>
+    <div class="form-group">
+           <a href="{!! route('$VIEW_PREFIX$$MODEL_NAME_PLURAL_CAMEL$.index') !!}" class="btn btn-default">Back</a>
+    </div>
+  </div>
+</section>
+@stop

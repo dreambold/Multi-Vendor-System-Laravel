@@ -1,0 +1,37 @@
+<?php
+
+namespace $NAMESPACE_MODEL$;
+
+use Illuminate\Database\Eloquent\Model;
+
+$SOFT_DELETE_IMPORT$
+
+class $MODEL_NAME$ extends Model
+{
+$SOFT_DELETE$
+    public $table = '$TABLE_NAME$';
+    $TIMESTAMPS$
+$SOFT_DELETE_DATES$
+$PRIMARY$
+    public $fillable = [
+        $FIELDS$
+    ];
+
+    /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        $CAST$
+    ];
+
+    /**
+     * Validation rules
+     *
+     * @var array
+     */
+    public static $rules = [
+        $RULES$
+    ];
+}

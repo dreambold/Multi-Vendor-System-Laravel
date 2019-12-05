@@ -1,0 +1,36 @@
+/* dtree样式 */
+.dtree {
+	font-family: SimSun, SimHei, Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	color: #000;
+	white-space: nowrap;
+	margin-top:5px;
+}
+.dtree img {
+	border: 0px;
+	vertical-align: middle;
+}
+.dtree a {
+	color: #000;
+	text-decoration: none;
+}
+.dtree a.node, .dtree a.nodeSel {
+	white-space: nowrap;
+	padding: 1px 2px 1px 2px;
+}
+.dtree a.node:hover, .dtree a.nodeSel:hover {
+	color: #000;
+	text-decoration: underline;
+}
+.dtree a.nodeSel {
+	/*color:#b3e2ff;*/
+	font-weight:bold;
+	/*background-color: #094a74;*/
+}
+.dtree .clip {
+	overflow: hidden;
+}
+
+.dTreeNode a{
+	cursor:pointer;
+}

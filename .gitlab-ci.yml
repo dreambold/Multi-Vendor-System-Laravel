@@ -1,0 +1,44 @@
+# Variables
+variables:
+  MYSQL_ROOT_PASSWORD: root
+  MYSQL_USER: homestead
+  MYSQL_PASSWORD: secret
+  MYSQL_DATABASE: homestead
+  DB_HOST: mysql
+  DB_CONNECTION: mysql
+
+test:
+  image: chilio/laravel-dusk-ci:stable
+  services:
+     - mysql:5.7
+  cache:
+    key: ${CI_COMMIT_REF_NAME}
+    paths:
+      - vendor
+      - node_modules
+      - resources/assets/vendors
+
+  script:
+    - gulp --version
+    - node-sass --version
+    - nginx -v
+    - yarn
+    #- yarn --network-concurrency 1
+    - composer install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
+    - bower install --allow-root --quiet
+    - npm run dev
+    - cp .env.dusk.testing .env
+    - php artisan key:generate
+    - configure-laravel
+    - cp phpunit.ci.xml phpunit.xml
+    - ./vendor/phpunit/phpunit/phpunit -v --coverage-text --colors --stderr
+    - start-nginx-ci-project
+    - php artisan dusk --colors --debug
+
+  artifacts:
+    paths:
+      - ./storage/logs # for debugging
+      - ./tests/Browser/screenshots
+      - ./tests/Browser/console
+    expire_in: 1 days
+    when: always
