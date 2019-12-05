@@ -10,6 +10,8 @@ Find product
 @section('header_styles')
 <link href="{{asset('assets/css/checkout.css')}}" rel="stylesheet">
 <link href="{{asset('assets/css/checkbox.css')}}" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/slick/slick.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/slick/slick-theme.css') }}">
 @stop
 {{-- breadcrumb --}}
 @section('top')
@@ -21,7 +23,7 @@ Find product
 @section('content')
     <!-- Container Section Start -->
     <div class="container">
-        <h2><img role="presentation" width="129" height="60"  alt="mega bay Logo" src="{{asset("/assets")}}/img/logo.png" id="gh-logo"> Checkout</h2>
+        <h2><a href = "{{url("/")}}"><img role="presentation" width="200" height="60"  alt="Mega Bay Logo" src="{{asset("/assets")}}/img/logo.png" id="gh-logo"></a> Checkout</h2>
         <div class = "row">
             <div class = "container-wrapper">
                 <div class = "pay_type_title_wrapper">
@@ -31,21 +33,12 @@ Find product
                 <ul class = "pay_type_wrapper">
                     <li>
                         <label>
-                            <input type="radio" class="ace" name = "pay_type">
-                            <span class="lbl"><img src = "{{asset("/assets")}}/img/mastercard.png" style = "width:51px;"></span>
+                            <input type="checkbox" class="ace" name = "pay_type" value = "0">
+                            <span class="lbl"><img src = "{{asset("/assets")}}/img/mastercard.png" style = "width:51px;"> Mega buy payment</span>
                         </label>
                     </li>
-                    <li>
-                        <label>
-                            <input type="radio" class="ace" name = "pay_type">
-                            <span class="lbl"><img src = "{{asset("/assets")}}/img/paypal2.png" style = "width:51px;"></span>
-                        </label>
-                    </li>
-                    <li>
-                        <label>
-                            <input type="radio" class="ace" name = "pay_type">
-                            <span class="lbl"><img src = "{{asset("/assets")}}/img/american-express.png" style = "width:51px;"></span>
-                        </label>
+                    <li style = "height:70px; line-height:70px;">
+                        * If you would discount the product buying, you do not check these items
                     </li>
                 </ul>
             </div>
@@ -53,54 +46,65 @@ Find product
                 <div class = "title_wrapper">
                     Ship to
                 </div>
-                <ul class = "ship_ul">
-                    <li>jin weiguo</li>
-                    <li>beilu</li>
-                    <li>shanghai 上海 20063</li>
-                    <li>China</li>
-                    <li>13xxxxx25</li>
-                    <li><a>change</a></li>
-                </ul>
+                <div class = "row ml-0 mr-0" id = "ship_info_wrapper" >
+                    @include("front/checkout/ship_info")
+                </div>
+                <div style = "width:100%;"><a href = "javascript:void(0);"  class = "color-blue" onclick = "manageReceiveAddress();">change</a></div>
             </div>
             <div class = "container-wrapper">
                 <div class = "title_wrapper">
                     Review item and shipping
                 </div>
-                <div style = "padding-top:10px; padding-bottom:10px;">
-                    <span style = "color:#989898;">Seller:&nbsp;kriswatches &nbsp;&nbsp;| &nbsp;&nbsp;</span><a>Message to seller</a>
-                </div>
-                <div class = "row">
-                    <div class = "col-xs-3 text-center">
-                        <img src = "{{asset("/assets")}}/images/cart/big/1.jpg" style = "width:80px;">
-                    </div>
-                    <div class = "col-xs-9">
-                        <div class = "ship_description_wrapper">
-                            <span>
-                                Citizen NH 8354-58A Men Automatic Stainless Steel Analog White Day Date Watch
-                            </span>
+                @foreach($basketList as $key =>$item)
+                    @if(is_numeric($key))
+                        <div style = "padding-top:10px; padding-bottom:10px;">
+                            <span style = "color:#989898;">Seller:&nbsp;{{$item[0]['seller']['first_name']}}@if($item[0]['seller']['first_name'] != "")  @endif {{$item[0]['seller']['last_name']}} &nbsp;&nbsp;| &nbsp;&nbsp;</span><a>Message to seller</a>
                         </div>
-                        <div class = "ship_price_wrapper">
-                            <span>US $134.54</span>
-                        </div>
-                        <div>
-                            <span>Quantity</span>
-                            <input type = "number" value = "1" style = "width:80px; margin-left:10px;">
-                        </div>
-                        <div style = "padding-top:10px; padding-bottom:10px;color:black; font-weight: bold;">
-                            Shipping
-                        </div>
-                        <label>
-                            <input type="radio" class="ace" name = "shipping_price">
-                            <span class="lbl">Economy international Shipping<br><span style = "margin-left:35px;">Free</span></span>
-                        </label>
-                        <label>
-                            <input type="radio" class="ace" name = "shipping_price">
-                            <span class="lbl">Economy international Shipping<br><span style = "margin-left:35px;">US $22.00</span></span>
-                        </label>
-                    </div>
-                </div>
+                        @foreach($item as $key1 => $item1)
+                            <div class = "row border-bottom" style = "padding-bottom:10px; margin-bottom:10px;">
+                                <div class = "col-xs-3 text-center">
+                                    <img src = "{{correctImgPath($item1['img'])}}" style = "width:80px;">
+                                </div>
+                                <div class = "col-xs-9">
+                                    <div class = "ship_description_wrapper">
+                                        <span>
+                                            {{$item1['title']}}
+                                        </span>
+                                    </div>
+                                    <div class = "ship_price_wrapper">
+                                        <span>US ${{number_format($item1['price']*$item1['product_count'],2)}}</span>
+                                    </div>
+                                    <div>
+                                        <span>Quantity</span>
+                                        <input type = "number" value = "{{$item1['product_count']}}" onchange="changeQty(this)" data-id = "{{$item1['basketId']}}" data-price = "{{$item1['price']}}" style = "width:80px; margin-left:10px;">
+                                    </div>
+                                    @if($item1['varirant_str'] <>'')
+                                    <div style = "padding-top:10px; padding-bottom:10px;color:black; font-weight: bold;">
+                                        Variant
+                                    </div>
+                                    <label>
+                                        {{$item1['varirant_str']}}
+                                    </label>
+                                    @endif
+                                    <div class = "hidden" style = "padding-top:10px;color:black; font-weight: bold;">
+                                        Shipping
+                                    </div>
+                                    <label class = "hidden">
+                                        <input type="radio" class="ace" name = "shipping_price">
+                                        <span class="lbl">Economy international Shipping<br><span style = "margin-left:35px;">Free</span></span>
+                                    </label>
+                                    <label class = "hidden">
+                                        <input type="radio" class="ace" name = "shipping_price">
+                                        <span class="lbl">Economy international Shipping<br><span style = "margin-left:35px;">US $22.00</span></span>
+                                    </label>
+                                </div>
+                            </div>
+                        @endforeach
+                        <div class = "hidden" style = "height:1px; background: #e2e2e2; "></div>
+                    @endif
+                @endforeach
             </div>
-            <div class = "container-wrapper">
+            <div class = "container-wrapper hidden">
                 <div class = "title_wrapper">
                     Add coupons
                 </div>
@@ -115,7 +119,7 @@ Find product
                     </div>
                 </div>
             </div>
-            <div class = "container-wrapper">
+            <div class = "container-wrapper hidden">
                 <div style = "font-size: 16px; font-weight: bold;color: #5d5b5b; margin-bottom: 10px;">
                     <span>Donate to charity(optional)</span>
                 </div>
@@ -142,13 +146,13 @@ Find product
 
     <div class = "checkout_btn_wrapper">
         <div class="row text-right">
-            <span>To add more items ,</span><a href = "{{url("/cart")}}" style = "color:darkblue">go to cart</a>
+            <span>To add more items ,</span><a href = "{{url("front/basket/index")}}" style = "color:darkblue">go to cart</a>
         </div>
         <div class = "row">
             <div class = "first_wrapper">
                 <div>
-                    <span>Subtotal(1 item)</span>
-                    <span style = "float:right">US $17.99</span>
+                    <span>Subtotal({{$basketList['itemCount']}} item)</span>
+                    <span style = "float:right">US ${{$basketList['totalPrice']}}</span>
                 </div>
                 <div>
                     <span>Shipping</span>
@@ -158,18 +162,155 @@ Find product
             <div class = "second_wrapper">
                 <div>
                     <span>Order total</span>
-                    <span style = "float:right">US $17.99</span>
+                    <span style = "float:right">US ${{number_format($basketList['totalPrice']+$basketList['transPrice'],2)}}</span>
                 </div>
             </div>
             <div class = "three_wrapper text-center">
-                <button type = "button" style = "width:90%; height:40px; line-height:40px;"><i class = "fa fa-lock"></i> Confirm and play</button>
+            <form method="POST" action="{{url('front/checkout/createOrder')}}">
+                <input type="hidden" name="_token" value="{{csrf_token()}}" />
+                <input type="hidden" name="immeditaly_type" value="{{$immeditaly_type}}" />
+                <button type = "submit" style = "width:90%; height:40px; line-height:40px;"><i class = "fa fa-lock"></i> Confirm and play</button>
+            </form>
             </div>
         </div>
     </div>
-    
+    <script>
+        function changeQty(obj){
+            var id = $(obj).attr("data-id");
+            var num = $(obj).val();
+            if(isNaN(num)) return;
+            if(num <=0 ) {
+                num = 1;
+            }
+            var param = new Object();
+            param._token = _token;
+            param.id = id;
+            param.product_count = num;
+            $.post("{{url("front/basket/ajaxSaveBasketInfo")}}", param, function(data){
+                if(data.status == "1"){
+                    window.location.reload();
+                }else{
+                    errorMsg(data.msg);
+                }
+            }, "json");
+        }
+
+
+
+        function refreshShipAddress(){
+            var param = new Object();
+            param._token = _token;
+            $.post("{{url("front/user_receive_address/ajaxGetActiveInfo")}}", param, function(html){
+                $("#ship_info_wrapper").html(html);
+            });
+        }
+
+        function manageReceiveAddress(){
+            var param = new Object();
+            param._token = _token;
+            $.post("{{url("front/user_receive_address/ajaxList")}}", param, function(html){
+                $("#user_receive_address_dlg #content").html(html);
+                $("#user_receive_address_dlg").modal("show");
+            });
+
+        }
+
+        function refreshUserReceiveAddressList(){
+            var param = new Object();
+            param._token = "{{csrf_token()}}";
+            $.post("{{url("front/user_receive_address/ajaxList")}}", param, function(html){
+                $("#user_receive_address_dlg #content").html(html);
+                $("#user_receive_address_edit_dlg").modal("hide");
+            });
+        }
+
+        function onDelUserReceiveAddress(id){
+            confirmMsg("Do you sure Delete!", function(){
+                var param = new Object();
+                param._token = _token;
+                param.id =id;
+                $.post("{{url("front/user_receive_address/ajaxDeleteInfo")}}", param, function(data){
+                    setTimeout(function(){
+                        if(data.status == "1"){
+                            refreshUserReceiveAddressList();
+                        }else{
+                            errorMsg(data.msg);
+                        }
+                    },1000);
+                },"json");
+            })
+        }
+
+        function onUserReceiveAddressSetActive(id){
+            var param = new Object();
+            param._token = _token;
+            param.id =id;
+            $.post("{{url("front/user_receive_address/ajaxSetActive")}}", param, function(data){
+                if(data.status == "1"){
+                    refreshShipAddress();
+                    refreshUserReceiveAddressList();
+                }else{
+                    errorMsg(data.msg);
+                }
+            },"json");
+        }
+
+        // function createOrder(){
+
+        //     confirmMsg("Do you sure create order!", function(){
+        //         var param = new Object();
+        //         param._token = _token;
+        //         param.immeditaly_type = "{{$immeditaly_type}}";
+        //         var orderIds = "";
+        //         /*$.post("{{url("front/checkout/createOrder")}}", param, function(data){
+        //             console.log(3);
+        //             setTimeout(function(){
+        //                 if(data.status == "1"){
+        //                     orderIds = data.orderIds;
+        //                     var pay_type = $("input[name='pay_type']:checked").val();
+        //                     if(pay_type==undefined){
+        //                         successMsg("your orders has created move  to order page !", function(){
+        //                            window.location.href = "{{url("front/my/activity_purchase_history")}}";
+        //                         });
+        //                     }else{
+        //                         setTimeout(function(){
+        //                             confirmMsg1("Do you sure continue  pay to order!", function(){
+        //                                 alert("here pay module");
+        //                                 payOrder(orderIds, pay_type);
+        //                             }, function(){
+        //                                 window.location.href = "{{url("front/my/activity_purchase_history")}}";
+        //                             });
+        //                         }, 1000);
+        //                     }
+                           
+        //                 }else{
+        //                     errorMsg(data.msg);
+        //                 }
+        //             },1000);
+        //         },"json");*/
+        //         $.ajax({
+                    
+        //             url: "{{url("front/checkout/createOrder")}}",
+        //             method: "POST",
+        //             crossDomain: true,
+        //             data: param,
+        //             success: function(data) {
+        //                 $('html').html(data)
+        //                 console.log (data);
+        //             },
+        //             error: function(res) {
+        //                 console.log (res);
+        //             }
+        //         });
+        //     })
+        // }
+
+    </script>
+    @include("front/user_receive_address/user_receive_address_dlg");
+    @include("front/checkout/pay");
 @stop
 
 {{-- page level scripts --}}
 @section('footer_scripts')
-
+    <script type="text/javascript" src="{{ asset('assets/js/common.js') }}"></script>
 @stop
